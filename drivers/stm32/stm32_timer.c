@@ -4,10 +4,9 @@
 #include <log.h>
 
 #if defined(BSP_USING_TIMER1) || defined(BSP_USING_TIMER2) || defined(BSP_USING_TIMER3) \
- || defined(BSP_USING_TIMER4) || defined(BSP_USING_TIMER5) || defined(BSP_USING_TIMER6) \
- || defined(BSP_USING_TIMER7) || defined(BSP_USING_TIMER14) || defined(BSP_USING_TIMER15) \
- || defined(BSP_USING_TIMER16) || defined(BSP_USING_TIMER17) || defined(BSP_USING_TIMER21) \
- || defined(BSP_USING_TIMER22)
+ || defined(BSP_USING_TIMER4) || defined(BSP_USING_TIMER6) || defined(BSP_USING_TIMER7) \
+ || defined(BSP_USING_TIMER14) || defined(BSP_USING_TIMER15) || defined(BSP_USING_TIMER16) \
+ || defined(BSP_USING_TIMER17) || defined(BSP_USING_TIMER21) || defined(BSP_USING_TIMER22)
 
 #if defined(STM32G0)
 #define __TIM1_IRQn               (13)
@@ -261,7 +260,6 @@ timer_hander_t timer_open(unsigned int timerid, unsigned int freq, void (*hdr)(v
     timer->hdr = hdr;
 
     timer->tim->PSC = SystemCoreClock / freq - 1;
-    timer->tim->SR = 0;
 
     NVIC_SetPriority(timer->irq, 3);
     NVIC_EnableIRQ(timer->irq);
@@ -275,8 +273,9 @@ void timer_start(timer_hander_t timer, unsigned int interval)
 
     LOG_ASSERT(ptimer != 0);
 
-    ptimer->tim->CNT = 0;
     ptimer->tim->ARR = interval - 1;
+    ptimer->tim->EGR = 1;
+    ptimer->tim->SR = 0;
     ptimer->tim->DIER = 1;
     ptimer->tim->CR1 = 1;
 }
@@ -289,7 +288,7 @@ void timer_stop(timer_hander_t timer)
 
     ptimer->tim->DIER = 0;
     ptimer->tim->CR1 = 0;
-    ptimer->tim->CNT = 0;
+    ptimer->tim->SR = 0;
 }
 
 void timer_close(timer_hander_t timer)

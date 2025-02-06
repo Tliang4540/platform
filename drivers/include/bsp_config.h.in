@@ -46,4 +46,16 @@
 #cmakedefine BSP_USING_TIMER21
 #cmakedefine BSP_USING_TIMER22
 
+/* PWM */
+#cmakedefine BSP_USING_PWM1
+#cmakedefine BSP_USING_PWM2
+#cmakedefine BSP_USING_PWM3
+#cmakedefine BSP_USING_PWM4
+#cmakedefine BSP_USING_PWM14
+#cmakedefine BSP_USING_PWM15
+#cmakedefine BSP_USING_PWM16
+#cmakedefine BSP_USING_PWM17
+#cmakedefine BSP_USING_PWM21
+#cmakedefine BSP_USING_PWM22
+
 #endif

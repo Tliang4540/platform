@@ -10,6 +10,7 @@
 #include <i2c.h>
 #include <oled/oled.h>
 #include <string.h>
+#include <pwm.h>
 
 #include "spi_test/spi_test.h"
 #include "led_dev/led_dev.h"
@@ -35,7 +36,7 @@ void os_msg_test(void *param)
     device_open(led);
 
     // 定时器1KHz运行
-    timer = timer_open(1, 1000, timer_test_callback);
+    timer = timer_open(0, 1000, timer_test_callback);
     // 定时器500个周期运行
     timer_start(timer, 500);
 
@@ -100,6 +101,28 @@ void os_led_test(void *param)
     }
 }
 
+static unsigned int pwm_test_stack[128];
+void pwm_test_task(void *param)
+{
+    pwm_hander_t pwm = pwm_open(0);
+    (void)param;
+
+    while (1)
+    {
+        pwm_set(pwm, 0, 1000, 800);
+        pwm_set(pwm, 1, 1000, 200);
+        pwm_enable(pwm, 0);
+        pwm_enable(pwm, 1);
+        os_delay(500);
+        pwm_set(pwm, 0, 10000, 8000);
+        pwm_set(pwm, 1, 10000, 2000);
+        os_delay(500);
+        pwm_disable(pwm, 0);
+        pwm_disable(pwm, 1);
+        os_delay(500);
+    }
+}
+
 int main(void)
 {
     clk_init();
@@ -114,11 +137,16 @@ int main(void)
 
     led_dev_register("led", 16);
 
+    pin_mode(0, PIN_MODE_FUNCTION_PP);
+    pin_function(0, 2);
+    pin_mode(1, PIN_MODE_FUNCTION_PP);
+    pin_function(1, 2);
+
     spi_test_init();
 
     os_task_create(os_led_test, 0, led_stack, sizeof(led_stack));
     os_task_create(os_msg_test, 0, msg_test_stack, sizeof(msg_test_stack));
-    // os_task_create(os_i2c_test, 0, i2c_stack, sizeof(i2c_stack));
+    os_task_create(pwm_test_task, 0, pwm_test_stack, sizeof(pwm_test_stack));
     systick_init(os_tick_update);
     os_start();
 }

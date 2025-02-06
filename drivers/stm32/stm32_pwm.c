@@ -3,244 +3,180 @@
 #include <bsp_config.h>
 #include <log.h>
 
-#if defined(BSP_USING_TIMER1) || defined(BSP_USING_TIMER2) || defined(BSP_USING_TIMER3) \
- || defined(BSP_USING_TIMER4) || defined(BSP_USING_TIMER5) || defined(BSP_USING_TIMER6) \
- || defined(BSP_USING_TIMER7) || defined(BSP_USING_TIMER14) || defined(BSP_USING_TIMER15) \
- || defined(BSP_USING_TIMER16) || defined(BSP_USING_TIMER17) || defined(BSP_USING_TIMER21) \
- || defined(BSP_USING_TIMER22)
+#if defined(BSP_USING_PWM1) || defined(BSP_USING_PWM2) || defined(BSP_USING_PWM3) \
+ || defined(BSP_USING_PWM4) || defined(BSP_USING_PWM14) || defined(BSP_USING_PWM15) \
+ || defined(BSP_USING_PWM16) || defined(BSP_USING_PWM17) || defined(BSP_USING_PWM21) \
+ || defined(BSP_USING_PWM22)
 
 #if defined(STM32G0)
-#define __TIM1_IRQn               (13)
-#define __TIM2_IRQn               (15)
-#define __TIM3_IRQn               (16)
-#define __TIM4_IRQn               (16)
-#define __TIM6_IRQn               (17)
-#define __TIM7_IRQn               (18)
-#define __TIM14_IRQn              (19)
-#define __TIM15_IRQn              (20)
-#define __TIM16_IRQn              (21)
-#define __TIM17_IRQn              (22)
-
-#define __TIM1_CLK_ENABLE()       (RCC->APBENR2 |= (1 << 11))
-#define __TIM1_CLK_DISABLE()      (RCC->APBENR2 &= ~(1 << 11))
-#define __TIM2_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 0))
-#define __TIM2_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 0))
-#define __TIM3_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 1))
-#define __TIM3_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 1))
-#define __TIM4_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 2))
-#define __TIM4_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 2))
-#define __TIM6_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 4))
-#define __TIM6_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 4))
-#define __TIM7_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 5))
-#define __TIM7_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 5))
-#define __TIM14_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 15))
-#define __TIM14_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 15))
-#define __TIM15_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 16))
-#define __TIM15_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 16))
-#define __TIM16_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 17))
-#define __TIM16_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 17))
-#define __TIM17_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 18))
-#define __TIM17_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 18))
+#define __PWM1_CLK_ENABLE()       (RCC->APBENR2 |= (1 << 11))
+#define __PWM1_CLK_DISABLE()      (RCC->APBENR2 &= ~(1 << 11))
+#define __PWM2_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 0))
+#define __PWM2_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 0))
+#define __PWM3_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 1))
+#define __PWM3_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 1))
+#define __PWM4_CLK_ENABLE()       (RCC->APBENR1 |= (1 << 2))
+#define __PWM4_CLK_DISABLE()      (RCC->APBENR1 &= ~(1 << 2))
+#define __PWM14_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 15))
+#define __PWM14_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 15))
+#define __PWM15_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 16))
+#define __PWM15_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 16))
+#define __PWM16_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 17))
+#define __PWM16_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 17))
+#define __PWM17_CLK_ENABLE()      (RCC->APBENR2 |= (1 << 18))
+#define __PWM17_CLK_DISABLE()     (RCC->APBENR2 &= ~(1 << 18))
 #elif defined (STM32L0)
-#define __TIM2_IRQn               (15)
-#define __TIM3_IRQn               (16)
-#define __TIM6_IRQn               (17)
-#define __TIM7_IRQn               (18)
-#define __TIM21_IRQn              (20)
-#define __TIM22_IRQn              (22)
-
-#define __TIM2_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 0))
-#define __TIM2_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 0))
-#define __TIM3_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 1))
-#define __TIM3_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 1))
-#define __TIM6_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 4))
-#define __TIM6_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 4))
-#define __TIM7_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 5))
-#define __TIM7_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 5))
-#define __TIM21_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 2))
-#define __TIM21_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 2))
-#define __TIM22_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 5))
-#define __TIM22_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 5))
+#define __PWM2_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 0))
+#define __PWM2_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 0))
+#define __PWM3_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 1))
+#define __PWM3_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 1))
+#define __PWM21_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 2))
+#define __PWM21_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 2))
+#define __PWM22_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 5))
+#define __PWM22_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 5))
 #elif defined (STM32F0)
-#define __TIM1_IRQn               (13)
-#define __TIM2_IRQn               (15)
-#define __TIM3_IRQn               (16)
-#define __TIM6_IRQn               (17)
-#define __TIM7_IRQn               (18)
-#define __TIM14_IRQn              (19)
-#define __TIM15_IRQn              (20)
-#define __TIM16_IRQn              (21)
-#define __TIM17_IRQn              (22)
-
-#define __TIM1_CLK_ENABLE()       (RCC->APB2ENR |= (1 << 11))
-#define __TIM1_CLK_DISABLE()      (RCC->APB2ENR &= ~(1 << 11))
-#define __TIM2_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 0))
-#define __TIM2_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 0))
-#define __TIM3_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 1))
-#define __TIM3_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 1))
-#define __TIM6_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 4))
-#define __TIM6_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 4))
-#define __TIM7_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 5))
-#define __TIM7_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 5))
-#define __TIM14_CLK_ENABLE()      (RCC->APB1ENR |= (1 << 8))
-#define __TIM14_CLK_DISABLE()     (RCC->APB1ENR &= ~(1 << 8))
-#define __TIM15_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 16))
-#define __TIM15_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 16))
-#define __TIM16_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 17))
-#define __TIM16_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 17))
-#define __TIM17_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 18))
-#define __TIM17_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 18))
+#define __PWM1_CLK_ENABLE()       (RCC->APB2ENR |= (1 << 11))
+#define __PWM1_CLK_DISABLE()      (RCC->APB2ENR &= ~(1 << 11))
+#define __PWM2_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 0))
+#define __PWM2_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 0))
+#define __PWM3_CLK_ENABLE()       (RCC->APB1ENR |= (1 << 1))
+#define __PWM3_CLK_DISABLE()      (RCC->APB1ENR &= ~(1 << 1))
+#define __PWM14_CLK_ENABLE()      (RCC->APB1ENR |= (1 << 8))
+#define __PWM14_CLK_DISABLE()     (RCC->APB1ENR &= ~(1 << 8))
+#define __PWM15_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 16))
+#define __PWM15_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 16))
+#define __PWM16_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 17))
+#define __PWM16_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 17))
+#define __PWM17_CLK_ENABLE()      (RCC->APB2ENR |= (1 << 18))
+#define __PWM17_CLK_DISABLE()     (RCC->APB2ENR &= ~(1 << 18))
 #endif
 
 struct stm32_pwm
 {
     TIM_TypeDef *tim;
-    IRQn_Type irq;
 };
 
 enum
 {
-#if defined(TIM1) && defined(BSP_USING_TIMER1)
-    TIMER1_INDEX,
+#if defined(TIM1) && defined(BSP_USING_PWM1)
+    PWM1_INDEX,
 #endif
-#if defined(TIM2) && defined(BSP_USING_TIMER2)
-    TIMER2_INDEX,
+#if defined(TIM2) && defined(BSP_USING_PWM2)
+    PWM2_INDEX,
 #endif
-#if defined(TIM3) && defined(BSP_USING_TIMER3)
-    TIMER3_INDEX,
+#if defined(TIM3) && defined(BSP_USING_PWM3)
+    PWM3_INDEX,
 #endif
-#if defined(TIM4) && defined(BSP_USING_TIMER4)
-    TIMER4_INDEX,
+#if defined(TIM4) && defined(BSP_USING_PWM4)
+    PWM4_INDEX,
 #endif
-#if defined(TIM6) && defined(BSP_USING_TIMER6)
-    TIMER6_INDEX,
+#if defined(TIM14) && defined(BSP_USING_PWM14)
+    PWM14_INDEX,
 #endif
-#if defined(TIM7) && defined(BSP_USING_TIMER7)
-    TIMER7_INDEX,
+#if defined(TIM15) && defined(BSP_USING_PWM15)
+    PWM15_INDEX,
 #endif
-#if defined(TIM14) && defined(BSP_USING_TIMER14)
-    TIMER14_INDEX,
+#if defined(TIM16) && defined(BSP_USING_PWM16)
+    PWM16_INDEX,
 #endif
-#if defined(TIM15) && defined(BSP_USING_TIMER15)
-    TIMER15_INDEX,
+#if defined(TIM17) && defined(BSP_USING_PWM17)
+    PWM17_INDEX,
 #endif
-#if defined(TIM16) && defined(BSP_USING_TIMER16)
-    TIMER16_INDEX,
+#if defined(TIM21) && defined(BSP_USING_PWM21)
+    PWM21_INDEX,
 #endif
-#if defined(TIM17) && defined(BSP_USING_TIMER17)
-    TIMER17_INDEX,
+#if defined(TIM22) && defined(BSP_USING_PWM22)
+    PWM22_INDEX,
 #endif
-#if defined(TIM21) && defined(BSP_USING_TIMER21)
-    TIMER21_INDEX,
-#endif
-#if defined(TIM22) && defined(BSP_USING_TIMER22)
-    TIMER22_INDEX,
-#endif
-    TIMER_INDEX_MAX
+    PWM_INDEX_MAX
 };
 
 static struct stm32_pwm pwm_list[] = 
 {
-#if defined(TIM1) && defined(BSP_USING_TIMER1)
-    {TIM1, __TIM1_IRQn, 0},
+#if defined(TIM1) && defined(BSP_USING_PWM1)
+    {TIM1},
 #endif
-#if defined(TIM2) && defined(BSP_USING_TIMER2)
-    {TIM2, __TIM2_IRQn, 0},
+#if defined(TIM2) && defined(BSP_USING_PWM2)
+    {TIM2},
 #endif
-#if defined(TIM3) && defined(BSP_USING_TIMER3)
-    {TIM3, __TIM3_IRQn, 0},
+#if defined(TIM3) && defined(BSP_USING_PWM3)
+    {TIM3},
 #endif
-#if defined(TIM4) && defined(BSP_USING_TIMER4)
-    {TIM4, __TIM4_IRQn, 0},
+#if defined(TIM4) && defined(BSP_USING_PWM4)
+    {TIM4},
 #endif
-#if defined(TIM6) && defined(BSP_USING_TIMER6)
-    {TIM6, __TIM6_IRQn, 0},
+#if defined(TIM14) && defined(BSP_USING_PWM14)
+    {TIM14},
 #endif
-#if defined(TIM7) && defined(BSP_USING_TIMER7)
-    {TIM7, __TIM7_IRQn, 0},
+#if defined(TIM15) && defined(BSP_USING_PWM15)
+    {TIM15},
 #endif
-#if defined(TIM14) && defined(BSP_USING_TIMER14)
-    {TIM14, __TIM14_IRQn, 0},
+#if defined(TIM16) && defined(BSP_USING_PWM16)
+    {TIM16},
 #endif
-#if defined(TIM15) && defined(BSP_USING_TIMER15)
-    {TIM15, __TIM15_IRQn, 0},
+#if defined(TIM17) && defined(BSP_USING_PWM17)
+    {TIM17},
 #endif
-#if defined(TIM16) && defined(BSP_USING_TIMER16)
-    {TIM16, __TIM16_IRQn, 0},
+#if defined(TIM21) && defined(BSP_USING_PWM21)
+    {PWM21},
 #endif
-#if defined(TIM17) && defined(BSP_USING_TIMER17)
-    {TIM17, __TIM17_IRQn, 0},
-#endif
-#if defined(TIM21) && defined(BSP_USING_TIMER21)
-    {TIM21, __TIM21_IRQn, 0},
-#endif
-#if defined(TIM22) && defined(BSP_USING_TIMER22)
-    {TIM22, __TIM22_IRQn, 0},
+#if defined(TIM22) && defined(BSP_USING_PWM22)
+    {PWM22},
 #endif
 };
 
-static void pwm_clk_enable(unsigned int timerid)
+static void pwm_clk_enable(unsigned int pwmid)
 {
-    switch (timerid)
+    switch (pwmid)
     {
-#if defined(TIM1) && defined(BSP_USING_TIMER1)
-    case TIMER1_INDEX:
-        __TIM1_CLK_ENABLE();
+#if defined(TIM1) && defined(BSP_USING_PWM1)
+    case PWM1_INDEX:
+        __PWM1_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM2) && defined(BSP_USING_TIMER2)
-    case TIMER2_INDEX:
-        __TIM2_CLK_ENABLE();
+#if defined(TIM2) && defined(BSP_USING_PWM2)
+    case PWM2_INDEX:
+        __PWM2_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM3) && defined(BSP_USING_TIMER3)
-    case TIMER3_INDEX:
-        __TIM3_CLK_ENABLE();
+#if defined(TIM3) && defined(BSP_USING_PWM3)
+    case PWM3_INDEX:
+        __PWM3_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM4) && defined(BSP_USING_TIMER4)
-    case TIMER4_INDEX:
-        __TIM4_CLK_ENABLE();
+#if defined(TIM4) && defined(BSP_USING_PWM4)
+    case PWM4_INDEX:
+        __PWM4_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM6) && defined(BSP_USING_TIMER6)
-    case TIMER6_INDEX:
-        __TIM6_CLK_ENABLE();
+#if defined(TIM14) && defined(BSP_USING_PWM14)
+    case PWM14_INDEX:
+        __PWM14_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM7) && defined(BSP_USING_TIMER7)
-    case TIMER7_INDEX:
-        __TIM7_CLK_ENABLE();
+#if defined(TIM15) && defined(BSP_USING_PWM15)
+    case PWM15_INDEX:
+        __PWM15_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM14) && defined(BSP_USING_TIMER14)
-    case TIMER14_INDEX:
-        __TIM14_CLK_ENABLE();
+#if defined(TIM16) && defined(BSP_USING_PWM16)
+    case PWM16_INDEX:
+        __PWM16_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM15) && defined(BSP_USING_TIMER15)
-    case TIMER15_INDEX:
-        __TIM15_CLK_ENABLE();
+#if defined(TIM17) && defined(BSP_USING_PWM17)
+    case PWM17_INDEX:
+        __PWM17_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM16) && defined(BSP_USING_TIMER16)
-    case TIMER16_INDEX:
-        __TIM16_CLK_ENABLE();
+#if defined(TIM21) && defined(BSP_USING_PWM21)
+    case PWM21_INDEX:
+        __PWM21_CLK_ENABLE();
         break;
 #endif
-#if defined(TIM17) && defined(BSP_USING_TIMER17)
-    case TIMER17_INDEX:
-        __TIM17_CLK_ENABLE();
-        break;
-#endif
-#if defined(TIM21) && defined(BSP_USING_TIMER21)
-    case TIMER21_INDEX:
-        __TIM21_CLK_ENABLE();
-        break;
-#endif
-#if defined(TIM22) && defined(BSP_USING_TIMER22)
-    case TIMER22_INDEX:
-        __TIM22_CLK_ENABLE();
+#if defined(TIM22) && defined(BSP_USING_PWM22)
+    case PWM22_INDEX:
+        __PWM22_CLK_ENABLE();
         break;
 #endif
     default:
@@ -248,23 +184,130 @@ static void pwm_clk_enable(unsigned int timerid)
     }
 }
 
-pwm_hander_t pwm_open(unsigned int timerid, unsigned int freq, unsigned int duty)
+void pwm_set(pwm_hander_t pwm, unsigned int channel, unsigned int period, unsigned int pulse)
 {
-    struct stm32_pwm *timer;
+    LOG_ASSERT(pwm != 0);
+    LOG_ASSERT(channel < 4);
 
-    LOG_ASSERT(timerid < TIMER_INDEX_MAX);
+    struct stm32_pwm *p = pwm;
+    unsigned int psc;
+    unsigned int tim_clock = SystemCoreClock / 1000000UL;
 
-    timer = &pwm_list[timerid];
+    period = period * tim_clock / 1000UL;
+    psc = period / 65535 + 1;
+    period = period / psc - 1;
+    pulse = pulse * tim_clock / psc / 1000ULL;
 
-    pwm_clk_enable(timerid);
+    p->tim->PSC = psc - 1;
+    p->tim->ARR = period;
 
-    timer->tim->PSC = SystemCoreClock / freq - 1;
-    timer->tim->SR = 0;
+    switch (channel)
+    {
+    case 0:
+        p->tim->CCR1 = pulse;
+        p->tim->CCMR1 |= TIM_CCMR1_OC1PE | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1;
+        break;
+    case 1:
+        p->tim->CCR2 = pulse;
+        p->tim->CCMR1 |= TIM_CCMR1_OC2PE | TIM_CCMR1_OC2M_2 | TIM_CCMR1_OC2M_1;
+        break;
+    case 2: 
+        p->tim->CCR3 = pulse;
+        p->tim->CCMR2 |= TIM_CCMR2_OC3PE | TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1;
+        break;
+    case 3:
+        p->tim->CCR4 = pulse;
+        p->tim->CCMR2 |= TIM_CCMR2_OC4PE | TIM_CCMR2_OC4M_2 | TIM_CCMR2_OC4M_1;
+        break;
+    default:
+        break;
+    }
+}
 
-    NVIC_SetPriority(timer->irq, 3);
-    NVIC_EnableIRQ(timer->irq);
+pwm_hander_t pwm_open(unsigned int pwmid)
+{
+    struct stm32_pwm *pwm;
 
-    return timer;
+    LOG_ASSERT(pwmid < PWM_INDEX_MAX);
+
+    pwm = &pwm_list[pwmid];
+
+    pwm_clk_enable(pwmid);
+
+    pwm->tim->EGR = 1;
+    pwm->tim->SR = 0;
+#if defined(STM32G0) || defined(STM32F0)
+    pwm->tim->BDTR = TIM_BDTR_MOE;
+#endif
+    return pwm;
+}
+
+void pwm_enable(pwm_hander_t pwm, unsigned int channel)
+{
+    LOG_ASSERT(pwm != 0);
+    LOG_ASSERT(channel < 4);
+
+    struct stm32_pwm *p = pwm;
+
+    switch (channel)
+    {
+    case 0:
+        p->tim->CCER |= TIM_CCER_CC1E;
+        break;
+    case 1:
+        p->tim->CCER |= TIM_CCER_CC2E;
+        break;
+    case 2:
+        p->tim->CCER |= TIM_CCER_CC3E;
+        break;
+    case 3:
+        p->tim->CCER |= TIM_CCER_CC4E;
+        break;
+    default:
+        break;
+    }
+
+    p->tim->CR1 = TIM_CR1_CEN | TIM_CR1_ARPE;
+}
+
+void pwm_disable(pwm_hander_t pwm, unsigned int channel)
+{
+    LOG_ASSERT(pwm != 0);
+    LOG_ASSERT(channel < 4);
+
+    struct stm32_pwm *p = pwm;
+
+    switch (channel)
+    {
+    case 0:
+        p->tim->CCER &= ~TIM_CCER_CC1E;
+        break;
+    case 1:
+        p->tim->CCER &= ~TIM_CCER_CC2E;
+        break;
+    case 2:
+        p->tim->CCER &= ~TIM_CCER_CC3E;
+        break;
+    case 3:
+        p->tim->CCER &= ~TIM_CCER_CC4E;
+        break;
+    default:
+        break;
+    }
+}
+
+void pwm_close(pwm_hander_t pwm)
+{
+    LOG_ASSERT(pwm != 0);
+
+    struct stm32_pwm *p = pwm;
+
+    p->tim->CR1 = 0;
+    p->tim->SR = 0;
+    p->tim->CCER = 0;
+#if defined(STM32G0) || defined(STM32F0)
+    p->tim->BDTR = 0;
+#endif
 }
 
 #endif

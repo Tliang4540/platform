@@ -44,7 +44,7 @@ option(BSP_USING_I2C3 "Enable I2C3" OFF)
 
 # TIMER
 option(BSP_USING_TIMER1 "Enable TIMER1" OFF)
-option(BSP_USING_TIMER2 "Enable TIMER2" ON)
+option(BSP_USING_TIMER2 "Enable TIMER2" OFF)
 option(BSP_USING_TIMER3 "Enable TIMER3" OFF)
 option(BSP_USING_TIMER4 "Enable TIMER4" OFF)
 option(BSP_USING_TIMER6 "Enable TIMER6" ON)
@@ -55,6 +55,20 @@ option(BSP_USING_TIMER16 "Enable TIMER16" OFF)
 option(BSP_USING_TIMER17 "Enable TIMER17" OFF)
 option(BSP_USING_TIMER21 "Enable TIMER21" ON)
 option(BSP_USING_TIMER22 "Enable TIMER22" ON)
+
+# PWM
+option(BSP_USING_PWM1 "Enable PWM1" OFF)
+option(BSP_USING_PWM2 "Enable PWM2" ON)
+option(BSP_USING_PWM3 "Enable PWM3" OFF)
+option(BSP_USING_PWM4 "Enable PWM4" OFF)
+option(BSP_USING_PWM6 "Enable PWM6" OFF)
+option(BSP_USING_PWM7 "Enable PWM7" OFF)
+option(BSP_USING_PWM14 "Enable PWM14" OFF)
+option(BSP_USING_PWM15 "Enable PWM15" OFF)
+option(BSP_USING_PWM16 "Enable PWM16" OFF)
+option(BSP_USING_PWM17 "Enable PWM17" OFF)
+option(BSP_USING_PWM21 "Enable PWM21" OFF)
+option(BSP_USING_PWM22 "Enable PWM22" OFF)
 
 # set the toolchain prefix and target flags
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
