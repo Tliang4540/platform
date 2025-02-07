@@ -26,7 +26,7 @@ option(BSP_USING_UART8 "Enable UART6" OFF)
 option(BSP_USING_LPUART1 "Enable LPUART1" OFF)
 option(BSP_USING_LPUART2 "Enable LPUART2" OFF)
 
-#SPI
+# SPI
 option(BSP_USING_SPI1 "Enable SPI1" ON)
 option(BSP_SPI1_RX_USING_DMA "Enable SPI1 RX DMA" ON)
 option(BSP_SPI1_TX_USING_DMA "Enable SPI1 TX DMA" ON)
@@ -37,10 +37,13 @@ option(BSP_USING_SPI3 "Enable SPI3" OFF)
 option(BSP_SPI3_RX_USING_DMA "Enable SPI3 RX DMA" OFF)
 option(BSP_SPI3_TX_USING_DMA "Enable SPI3 TX DMA" OFF)
 
-#I2C
+# I2C
 option(BSP_USING_I2C1 "Enable I2C1" ON)
 option(BSP_USING_I2C2 "Enable I2C2" ON)
 option(BSP_USING_I2C3 "Enable I2C3" OFF)
+
+# ADC
+option(BSP_USING_ADC1 "Enable ADC1" ON)
 
 # TIMER
 option(BSP_USING_TIMER1 "Enable TIMER1" OFF)

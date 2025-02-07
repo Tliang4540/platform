@@ -32,6 +32,9 @@
 #cmakedefine BSP_USING_I2C2
 #cmakedefine BSP_USING_I2C3
 
+/* ADC */
+#cmakedefine BSP_USING_ADC1
+
 /* TIMER */
 #cmakedefine BSP_USING_TIMER1
 #cmakedefine BSP_USING_TIMER2

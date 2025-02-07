@@ -11,6 +11,7 @@
 #include <oled/oled.h>
 #include <string.h>
 #include <pwm.h>
+#include <adc.h>
 
 #include "spi_test/spi_test.h"
 #include "led_dev/led_dev.h"
@@ -101,11 +102,22 @@ void os_led_test(void *param)
     }
 }
 
+void pwm_test_timer_callback(void)
+{
+
+}
+
 static unsigned int pwm_test_stack[128];
 void pwm_test_task(void *param)
 {
+    unsigned int tmp;
     pwm_hander_t pwm = pwm_open(0);
+    adc_hander_t adc = adc_open(0);
+    timer_hander_t timer;
+
     (void)param;
+    adc_set_channel(adc, 2);
+    timer = timer_open(1, 1000000, pwm_test_timer_callback);
 
     while (1)
     {
@@ -113,12 +125,30 @@ void pwm_test_task(void *param)
         pwm_set(pwm, 1, 1000, 200);
         pwm_enable(pwm, 0);
         pwm_enable(pwm, 1);
+
+        timer_start(timer, 50000);
+        tmp = adc_read(adc);
+        timer_stop(timer);
+        LOG_I("adc:%d, timer:%d\n", tmp, timer_read(timer));
+
         os_delay(500);
         pwm_set(pwm, 0, 10000, 8000);
         pwm_set(pwm, 1, 10000, 2000);
+
+        timer_start(timer, 50000);
+        tmp = adc_read(adc);
+        timer_stop(timer);
+        LOG_I("adc:%d, timer:%d\n", tmp, timer_read(timer));
+
         os_delay(500);
         pwm_disable(pwm, 0);
         pwm_disable(pwm, 1);
+
+        timer_start(timer, 50000);
+        tmp = adc_read(adc);
+        timer_stop(timer);
+        LOG_I("adc:%d, timer:%d\n", tmp, timer_read(timer));
+
         os_delay(500);
     }
 }
