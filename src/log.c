@@ -114,11 +114,13 @@ void log_dump(const void *data, unsigned leng)
     serial_write(m_serial, log_buf, buf_index);
 }
 
+#ifndef NDEBUG
 void log_assert(const char *ex_str, const char *func, unsigned int line)
 {
     log_printf("%s:%d:(%s)\n", func, line, ex_str);
     while(1);
 }
+#endif
 
 void log_init(unsigned serial_id, unsigned baud)
 {

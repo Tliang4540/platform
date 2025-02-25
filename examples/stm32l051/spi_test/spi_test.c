@@ -59,7 +59,7 @@ static void spi_test_task(void *param)
         spi_transfer(spi, tmp_buf, 4);
         spi_transfer(spi, data_buf, 32);
         pin_write(SPI_CS_PIN, 1);
-        LOG_I("read %x addr data:\n", read_addr);
+        LOG_I("read %x addr data:", read_addr);
         LOG_DUMP(data_buf, 32);
         read_addr += 32;
     }

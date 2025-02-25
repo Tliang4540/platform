@@ -166,18 +166,18 @@ void i2c_read(i2c_dev_t *dev, i2c_msg_t *reg_addr, i2c_msg_t *data)
     {
         if (msg)
         {
-            LOG_E("i2c rs:%x\n", msg);
+            LOG_E("i2c rs:%x", msg);
         }
     }
     else
     {
-        LOG_E("i2c r timeout\n");
+        LOG_E("i2c r timeout");
     }
 
     if (i2c->i2c->ISR & I2C_ISR_BUSY)
     {
         i2c->i2c->CR1 = 0;
-        LOG_E("i2c rb reset\n");
+        LOG_E("i2c rb reset");
         i2c->i2c->CR1 = 1;
     }
 
@@ -209,18 +209,18 @@ void i2c_write(i2c_dev_t *dev, i2c_msg_t *data)
     {
         if (msg)
         {
-            LOG_E("i2c ws:%x\n", msg);
+            LOG_E("i2c ws:%x", msg);
         }
     }
     else
     {
-        LOG_E("i2c w timeout\n");
+        LOG_E("i2c w timeout");
     }
 
     if (i2c->i2c->ISR & I2C_ISR_BUSY)
     {
         i2c->i2c->CR1 = 0;
-        LOG_E("i2c wb reset\n");
+        LOG_E("i2c wb reset");
         i2c->i2c->CR1 = 1;
     }
 

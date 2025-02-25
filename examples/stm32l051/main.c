@@ -46,7 +46,7 @@ void os_msg_test(void *param)
         ret = os_msg_recv(&msg_test, &recv_msg, 300);
         if (ret == 0)
         {
-            LOG_I("recv msg:%d\n", recv_msg);
+            LOG_I("recv msg:%d", recv_msg);
 
             if (recv_msg % 2)
                 device_write(led, "\x01", 1);
@@ -55,7 +55,7 @@ void os_msg_test(void *param)
         }
         else
         {
-            LOG_I("recv timeout.\n");
+            LOG_I("recv timeout.");
         }
     }
 }
@@ -129,7 +129,7 @@ void pwm_test_task(void *param)
         timer_start(timer, 50000);
         tmp = adc_read(adc);
         timer_stop(timer);
-        LOG_I("adc:%d, timer:%d\n", tmp, timer_read(timer));
+        LOG_I("adc:%d, timer:%d", tmp, timer_read(timer));
 
         os_delay(500);
         pwm_set(pwm, 0, 10000, 8000);
@@ -138,7 +138,7 @@ void pwm_test_task(void *param)
         timer_start(timer, 50000);
         tmp = adc_read(adc);
         timer_stop(timer);
-        LOG_I("adc:%d, timer:%d\n", tmp, timer_read(timer));
+        LOG_I("adc:%d, timer:%d", tmp, timer_read(timer));
 
         os_delay(500);
         pwm_disable(pwm, 0);
@@ -147,7 +147,7 @@ void pwm_test_task(void *param)
         timer_start(timer, 50000);
         tmp = adc_read(adc);
         timer_stop(timer);
-        LOG_I("adc:%d, timer:%d\n", tmp, timer_read(timer));
+        LOG_I("adc:%d, timer:%d", tmp, timer_read(timer));
 
         os_delay(500);
     }
@@ -163,7 +163,7 @@ int main(void)
     pin_function(9, 4);
     pin_function(10, 4);
     log_init(0, 115200);
-    LOG_I("system startup.\n");
+    LOG_I("system startup.");
 
     led_dev_register("led", 16);
 

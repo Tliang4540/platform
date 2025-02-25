@@ -57,7 +57,7 @@ void os_serial_test(void *param)
         spi_transfer(spi, tmp_buf, 4);
         spi_transfer(spi, data_buf, 32);
         pin_write(52, 1);
-        LOG_I("read %x addr data:\n", read_addr);
+        LOG_I("read %x addr data:", read_addr);
         LOG_DUMP(data_buf, 32);
         read_addr += 32;
     }
@@ -106,7 +106,7 @@ void os_i2c_test(void *param)
             i2c_read(&dev, &addr_msg, &data_msg);
             if ((data[0] != 0) || (data[1] != 0))
             {
-                LOG_I("i2c read data:%x%x\n", data[0], data[1]);
+                LOG_I("i2c read data:%x%x", data[0], data[1]);
                 os_delay(100);
             }
         }
@@ -138,12 +138,12 @@ void os_msg_test(void *param)
         ret = os_msg_recv(&msg_test, &recv_msg, 300);
         if (ret == 0)
         {
-            LOG_I("recv msg:%d\n", recv_msg);
+            LOG_I("recv msg:%d", recv_msg);
             pin_write(9, recv_msg & 1);
         }
         else
         {
-            LOG_I("recv timeout.\n");
+            LOG_I("recv timeout.");
         }
     }
 }
@@ -177,7 +177,7 @@ int main(void)
     pin_function(2, 1);
     pin_function(3, 1);
     log_init(1, 115200);
-    LOG_I("system startup.\n");
+    LOG_I("system startup.");
 
     led_dev_register("led", 8);
 

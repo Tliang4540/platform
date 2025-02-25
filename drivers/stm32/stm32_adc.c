@@ -75,7 +75,7 @@ unsigned int adc_read(adc_hander_t adc)
 
     while (!(p->adc->ISR & ADC_ISR_EOC));
 
-    return p->adc->DR;
+    return p->adc->DR * 3300 / 4096;
 }
 
 void adc_set_channel(adc_hander_t adc, unsigned int channel)
