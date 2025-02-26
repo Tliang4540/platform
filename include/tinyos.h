@@ -2,7 +2,7 @@
 #define __TINYOS_H__
 
 #define OS_INVALID_VAL          (0xffffffff)
-#define OS_TICK_MAX             (0xfffffffe)
+#define OS_TICK_MAX             (0x7fffffff)
 
 typedef struct os_msg
 {
@@ -39,6 +39,7 @@ void os_tick_update(void);
 /**
  * @brief 任务延时
  * @param [in] tick 延时多少个系统tick
+ * @note 超过OS_TICK_MAX会溢出
  */
 void os_delay(unsigned int tick);
 
@@ -46,7 +47,7 @@ void os_delay(unsigned int tick);
  * @brief 接收一个消息
  * @param [in] msg 消息句柄
  * @param [out] data 接收到的数据
- * @param [in] tick 超时周期
+ * @param [in] tick 超时周期, OS_INVALID_VAL:永久等待
  * @retval 0:成功 other:超时
  */
 int os_msg_recv(os_msg_t *msg, unsigned int *data, unsigned int tick);

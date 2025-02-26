@@ -1,4 +1,5 @@
 #include <tinyos.h>
+#include <log.h>
 
 #ifndef OS_TASK_NUM_MAX
 #define OS_TASK_NUM_MAX         (5)
@@ -7,6 +8,7 @@
 struct os_tcb
 {
     unsigned int tick;
+    unsigned int state;
     void *stack;
 };
 
@@ -36,12 +38,11 @@ void os_update_sp(void)
     for (i = 0; i < (OS_TASK_NUM_MAX - 1); i++)
     {
         // 为当前任务、空任务、挂起任务直接跳过
-        if ((i == os_cur_task_idx) || (os_task_list[i].stack == 0) || 
-            (os_task_list[i].tick == OS_INVALID_VAL))
+        if ((i == os_cur_task_idx) || (os_task_list[i].state == 0))
             continue;
 
         // 时间到执行
-        if ((unsigned int)(os_sys_tick - os_task_list[i].tick) < (OS_TICK_MAX / 2))
+        if ((os_sys_tick - os_task_list[i].tick) < (unsigned int)(OS_TICK_MAX))
         {
             break;
         }
@@ -57,7 +58,7 @@ int os_task_create(void (*func)(void *), void *param, void *stack, unsigned int 
 
     for (task_id = 0; task_id < (OS_TASK_NUM_MAX - 1); task_id++)
     {
-        if (os_task_list[task_id].stack == 0)
+        if (os_task_list[task_id].state == 0)
         {
             break;
         }
@@ -69,13 +70,14 @@ int os_task_create(void (*func)(void *), void *param, void *stack, unsigned int 
     // 初始化任务栈
     os_task_list[task_id].stack = _os_stack_init(func, param, stack, stack_size);
     os_task_list[task_id].tick = os_sys_tick;
+    os_task_list[task_id].state = 1;
 
     return task_id;
 }
 
 void os_task_delete(unsigned int task_id)
 {
-    os_task_list[task_id].stack = 0;
+    os_task_list[task_id].state = 0;
     if (task_id == os_cur_task_idx)
         _os_switch();
 }
@@ -104,6 +106,7 @@ void os_start(void)
 
 void os_delay(unsigned int tick)
 {
+    LOG_ASSERT(tick <= OS_TICK_MAX);
     os_task_list[os_cur_task_idx].tick = os_sys_tick + tick;
     _os_switch();
 }
@@ -124,7 +127,10 @@ void os_msg_send(os_msg_t *msg, unsigned int data)
     msg->msg = data;
     // 如果有任务等待唤醒任务
     if (msg->wait_id < (OS_TASK_NUM_MAX - 1))
+    {
+        os_task_list[msg->wait_id].state = 1;
         os_task_list[msg->wait_id].tick = os_sys_tick;
+    }
 }
 
 int os_msg_recv(os_msg_t *msg, unsigned int *data, unsigned int tick)
@@ -133,7 +139,15 @@ int os_msg_recv(os_msg_t *msg, unsigned int *data, unsigned int tick)
     
     //先设置等待参数
     msg->wait_id = os_cur_task_idx; 
-    os_task_list[os_cur_task_idx].tick = os_sys_tick + tick;
+    if (tick != OS_INVALID_VAL)
+    {
+        LOG_ASSERT(tick <= OS_TICK_MAX);
+        os_task_list[os_cur_task_idx].tick = os_sys_tick + tick;
+    }
+    else
+    {
+        os_task_list[os_cur_task_idx].state = 0;
+    }
 
     // 如果没有消息切换任务
     if (msg->msg == OS_INVALID_VAL)
@@ -151,6 +165,7 @@ int os_msg_recv(os_msg_t *msg, unsigned int *data, unsigned int tick)
     else if (data)
     {
         *data = msg->msg;
+        os_task_list[os_cur_task_idx].state = 1;
     }
 
     msg->msg = OS_INVALID_VAL;
