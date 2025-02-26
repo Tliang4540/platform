@@ -7,6 +7,8 @@ if (NOT DEFINED PROJECT_NAME)
 endif()
 
 add_library(platform src/device.c src/log.c src/tinyos.c)
+set_source_files_properties(src/tinyos.c PROPERTIES COMPILE_DEFINITIONS OS_TASK_NUM_MAX=${OS_TASK_NUM_MAX})
+
 add_subdirectory(arch)
 add_subdirectory(components)
 add_subdirectory(drivers)

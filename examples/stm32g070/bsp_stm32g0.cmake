@@ -7,6 +7,9 @@ set(VECT_TAB_OFFSET 0x0000)
 # set log level
 set(LOG_LEVEL 3)
 
+# set task max num
+set(OS_TASK_NUM_MAX 8)
+
 # UART
 set(BSP_UART_BUFFER_SIZE 128) #设置UART默认缓存大小，未单独设置时使用此值
 set(BSP_UART1_TX_BUFSIZE 128) #单独设置UART1的发送缓存大小

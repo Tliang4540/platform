@@ -7,6 +7,9 @@ set(VECT_TAB_OFFSET 0x0000)
 # set log level
 set(LOG_LEVEL 3)
 
+# set task max num
+set(OS_TASK_NUM_MAX 8)
+
 # 使用SPI OLED
 option(USING_SPI_OLED "Enable SPI OLED" ON)
 
