@@ -59,7 +59,7 @@ adc_hander_t adc_open(unsigned int adcid)
 
     // 配置
     adc->adc->CFGR2 = ADC_CFGR2_CKMODE_0;
-    adc->adc->SMPR  = 3;    //12.5 clock cycles
+    adc->adc->SMPR  = 4;    //19.5 clock cycles
     adc->adc->CR    |= ADC_CR_ADEN;    //ADC enable
 
     return adc;
@@ -75,7 +75,7 @@ unsigned int adc_read(adc_hander_t adc)
 
     while (!(p->adc->ISR & ADC_ISR_EOC));
 
-    return p->adc->DR * 3300 / 4096;
+    return p->adc->DR * 3300ul / 4096ul;
 }
 
 void adc_set_channel(adc_hander_t adc, unsigned int channel)
