@@ -61,4 +61,7 @@
 #cmakedefine BSP_USING_PWM21
 #cmakedefine BSP_USING_PWM22
 
+/* WDT */
+#cmakedefine BSP_USING_WDT
+
 #endif

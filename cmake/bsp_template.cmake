@@ -76,6 +76,9 @@ option(BSP_USING_PWM17 "Enable PWM17" OFF)
 option(BSP_USING_PWM21 "Enable PWM21" OFF)
 option(BSP_USING_PWM22 "Enable PWM22" OFF)
 
+# WDT
+option(BSP_USING_WDT "Enable WDT" ON)
+
 # set the toolchain prefix and target flags
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(TARGET_FLAGS "-mcpu=cortex-m0plus ")
