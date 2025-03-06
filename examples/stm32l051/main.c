@@ -12,6 +12,7 @@
 #include <string.h>
 #include <pwm.h>
 #include <adc.h>
+#include <rtc.h>
 
 #include "spi_test/spi_test.h"
 #include "led_dev/led_dev.h"
@@ -23,16 +24,23 @@ void timer_test_callback(void)
     os_msg_send(&msg_test, send_msg++);
 }
 
+static unsigned int wakeup_flag = 0;
+static void rtc_wakeup_callback(void)
+{
+    wakeup_flag = 1;
+}
+
 static unsigned int msg_test_stack[128];
 void os_msg_test(void *param)
 {
     struct device *led;
+    struct rtc_tm time = {0, 0, 0, 4, 6, 3, 2025};
     unsigned int ret;
     unsigned int recv_msg;
     timer_hander_t timer;
     (void)param;
     os_msg_init(&msg_test);
-
+    rtc_set_time(&time);
     led = device_find("led");
     device_open(led);
 
@@ -56,6 +64,17 @@ void os_msg_test(void *param)
         else
         {
             LOG_I("recv timeout.");
+        }
+        rtc_get_time(&time);
+        ret = rtc_mktime(&time);
+        LOG_I("tamp:%d", ret);
+        rtc_localtime(ret, &time);
+        LOG_I("date:%d-%d-%d %d", time.year, time.mon, time.mday, time.wday);
+        LOG_I("time:%d:%d:%d", time.hour, time.min, time.sec);
+        if (wakeup_flag)
+        {
+            LOG_I("wakeup.");
+            wakeup_flag = 0;
         }
     }
 }
@@ -156,13 +175,14 @@ void pwm_test_task(void *param)
 int main(void)
 {
     clk_init();
+    clk_lse_init();
 
     pin_mode(9, PIN_MODE_FUNCTION_PP);
     pin_mode(10, PIN_MODE_FUNCTION_PP);
     pin_pull(10, PIN_PULL_UP);
     pin_function(9, 4);
     pin_function(10, 4);
-    log_init(0, 115200);
+    log_init(0, 500000);
     LOG_I("system startup.");
 
     led_dev_register("led", 16);
@@ -171,6 +191,9 @@ int main(void)
     pin_function(0, 2);
     pin_mode(1, PIN_MODE_FUNCTION_PP);
     pin_function(1, 2);
+
+    rtc_init();
+    rtc_wakeup_time_open(1000, rtc_wakeup_callback);
 
     spi_test_init();
 

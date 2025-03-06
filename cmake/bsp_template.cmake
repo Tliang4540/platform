@@ -79,6 +79,9 @@ option(BSP_USING_PWM22 "Enable PWM22" OFF)
 # WDT
 option(BSP_USING_WDT "Enable WDT" ON)
 
+# RTC
+option(BSP_USING_RTC "Enable RTC" ON)
+
 # set the toolchain prefix and target flags
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(TARGET_FLAGS "-mcpu=cortex-m0plus ")

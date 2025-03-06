@@ -69,6 +69,14 @@ void clk_init(void)
 #endif
 }
 
+void clk_lse_init(void)
+{
+    LL_PWR_EnableBkUpAccess();
+    LL_RCC_LSE_Enable();
+    while (!LL_RCC_LSE_IsReady());
+    LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
+}
+
 void clk_exti_sleep(void)
 {
     // LL_RCC_PLL_Enable();

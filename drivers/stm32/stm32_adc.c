@@ -54,9 +54,15 @@ adc_hander_t adc_open(unsigned int adcid)
     LOG_ASSERT(adcid < ADC_INDEX_MAX);
 
     adc = &adc_list[adcid];
+    if (adc->adc->CR)
+        return adc;
 
     adc_clk_enable(adcid);
-
+    // 效准
+    adc->adc->CR = ADC_CR_ADVREGEN;
+    for (volatile unsigned int i = 0; i < 1000; i++);   //必须加入延时，否则会死机
+    adc->adc->CR |= ADC_CR_ADCAL;
+    while (adc->adc->CR & ADC_CR_ADCAL);
     // 配置
     adc->adc->CFGR2 = ADC_CFGR2_CKMODE_0;
     adc->adc->SMPR  = 4;    //19.5 clock cycles

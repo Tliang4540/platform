@@ -64,4 +64,7 @@
 /* WDT */
 #cmakedefine BSP_USING_WDT
 
+/* RTC */
+#cmakedefine BSP_USING_RTC
+
 #endif
