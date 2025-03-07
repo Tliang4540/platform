@@ -8,6 +8,7 @@
 #include <tinyos.h>
 #include <spi.h>
 #include <i2c.h>
+#include <rtc.h>
 
 #include "led_dev/led_dev.h"
 
@@ -120,6 +121,12 @@ void timer_test_callback(void)
     os_msg_send(&msg_test, send_msg++);
 }
 
+static unsigned int rtc_wakeup_flag = 0;
+void rtc_wakeup_callback(void)
+{
+    rtc_wakeup_flag = 1;
+}
+
 static unsigned int msg_test_stack[64];
 void os_msg_test(void *param)
 {
@@ -152,11 +159,14 @@ static unsigned int led_stack[64];
 void os_led_test(void *param)
 {
     struct device *led;
+    struct rtc_tm time = {0, 0, 0, 4, 6, 3, 2025};
+    unsigned int tmp;
 
     (void)param;
 
     led = device_find("led");
     device_open(led);
+    rtc_set_time(&time);
 
     while (1)
     {
@@ -164,20 +174,35 @@ void os_led_test(void *param)
         os_delay(100);
         device_write(led, "\x00", 1);
         os_delay(400);
+        rtc_get_time(&time);
+        tmp = rtc_mktime(&time);
+        LOG_I("tamp:%d", tmp);
+        rtc_localtime(tmp, &time);
+        LOG_I("date:%d-%d-%d %d", time.year, time.mon, time.mday, time.wday);
+        LOG_I("time:%d:%d:%d", time.hour, time.min, time.sec);
+        if (rtc_wakeup_flag)
+        {
+            LOG_I("wakeup.");
+            rtc_wakeup_flag = 0;
+        }
     }
 }
 
 int main(void)
 {
     clk_init();
+    clk_lsc_init(CLK_LSC_EXTERNAL);
 
     pin_mode(2, PIN_MODE_FUNCTION_PP);
     pin_mode(3, PIN_MODE_FUNCTION_PP);
     pin_pull(3, PIN_PULL_UP);
     pin_function(2, 1);
     pin_function(3, 1);
-    log_init(1, 115200);
+    log_init(1, 500000);
     LOG_I("system startup.");
+
+    rtc_init();
+    rtc_wakeup_time_open(1000, rtc_wakeup_callback);
 
     led_dev_register("led", 8);
 

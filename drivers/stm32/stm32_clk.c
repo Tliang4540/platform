@@ -69,12 +69,19 @@ void clk_init(void)
 #endif
 }
 
-void clk_lse_init(void)
+void clk_lsc_init(clk_lsc_t lsc)
 {
-    LL_PWR_EnableBkUpAccess();
-    LL_RCC_LSE_Enable();
-    while (!LL_RCC_LSE_IsReady());
-    LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
+    if (lsc == CLK_LSC_EXTERNAL)
+    {
+        LL_PWR_EnableBkUpAccess();
+        LL_RCC_LSE_Enable();
+        while (!LL_RCC_LSE_IsReady());
+        LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
+    }
+    else 
+    {
+        LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
+    }
 }
 
 void clk_exti_sleep(void)
