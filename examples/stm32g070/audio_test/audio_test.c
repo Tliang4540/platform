@@ -72,6 +72,7 @@ void audio_test_init(void)
 void audio_test_play(unsigned int index)
 {
     unsigned int size = audio_file_list[index + 1] - audio_file_list[index];
+    unsigned int read_size;
     unsigned int addr = audio_file_list[index];
 
     audio_play_start(audio_callback);
@@ -81,29 +82,18 @@ void audio_test_play(unsigned int index)
     {
         if (fill_size)
         {
-            if (fill_size <= size)
+            read_size = fill_size > size ? size : fill_size;
+            spiflash_read(&spiflash, AUDIO_FILE_START_ADDR + addr, fill_buffer, read_size);
+            for (unsigned int i = 0; i < read_size / 2; i++)
             {
-                spiflash_read(&spiflash, AUDIO_FILE_START_ADDR + addr, fill_buffer, fill_size);
-                for (unsigned int i = 0; i < fill_size / 2; i++)
-                {
-                    ((unsigned short *)fill_buffer)[i] = ((unsigned int)(((short*)fill_buffer)[i]) + 32768) >> 6;
-                }
-                size -= fill_size;
+                ((unsigned short *)fill_buffer)[i] = ((unsigned int)(((short*)fill_buffer)[i]) + 32768) >> 6;
             }
-            else 
+            for (unsigned int i = read_size / 2; i < fill_size / 2; i++)
             {
-                spiflash_read(&spiflash, AUDIO_FILE_START_ADDR + addr, fill_buffer, size);
-                for (unsigned int i = 0; i < size / 2; i++)
-                {
-                    ((unsigned short *)fill_buffer)[i] = ((unsigned int)(((short*)fill_buffer)[i]) + 32768) >> 6;
-                }
-                for (unsigned int i = size / 2; i < fill_size / 2; i++)
-                {
-                    ((unsigned short*)fill_buffer)[i] = 512;
-                }
-                size = 0;
+                ((unsigned short*)fill_buffer)[i] = 512;
             }
-            addr += fill_size;
+            size -= read_size;
+            addr += read_size;
             fill_size = 0;
         }
         os_delay(1);
