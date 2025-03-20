@@ -11,8 +11,8 @@
 
 struct os_tcb
 {
-    unsigned int tick;
-    unsigned int state;
+    volatile unsigned int tick;
+    volatile unsigned int state;
     void *stack;
 #if (OS_GET_FREE_STACK_ENABLE)
     void *stack_end;
@@ -22,7 +22,7 @@ struct os_tcb
 static unsigned int os_cur_task_idx = 0;             // 当前任务索引
 static struct os_tcb os_task_list[OS_TASK_NUM_MAX];  // 任务池
 
-static unsigned int os_sys_tick = 0;   //系统时间
+static volatile unsigned int os_sys_tick = 0;        //系统时间
 
 void os_tick_update(void)
 {

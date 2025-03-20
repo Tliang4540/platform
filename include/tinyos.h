@@ -6,8 +6,8 @@
 
 typedef struct os_msg
 {
-    unsigned int wait_id;
-    unsigned int msg;
+    volatile unsigned int wait_id;
+    volatile unsigned int msg;
 }os_msg_t;
 
 /**
