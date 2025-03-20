@@ -15,8 +15,8 @@
 #include "led_dev/led_dev.h"
 
 static unsigned int play_flag = 0;
-static unsigned int serial_stack[128];
-void os_serial_test(void *param)
+static unsigned int audio_stack[128];
+void os_audio_test(void *param)
 {
     unsigned int i = 68;
     LOG_OUT("%s", param);
@@ -30,6 +30,7 @@ void os_serial_test(void *param)
             if (i > 80)
                 i = 68;
             play_flag = 0;
+            LOG_I("os_audio_test free stack:%d", os_get_free_stack());
         }
     }
 }
@@ -71,6 +72,7 @@ void os_i2c_test(void *param)
             if ((data[0] != 0) || (data[1] != 0))
             {
                 LOG_I("i2c read data:%x%x", data[0], data[1]);
+                LOG_I("os_i2c_test free stack:%d", os_get_free_stack());
                 play_flag = 1;
                 os_delay(100);
             }
@@ -114,12 +116,12 @@ void os_msg_test(void *param)
         }
         else
         {
-            LOG_I("recv timeout.");
+            LOG_I("os_msg_test free stack:%d", os_get_free_stack());
         }
     }
 }
 
-static unsigned int led_stack[64];
+static unsigned int led_stack[84];
 void os_led_test(void *param)
 {
     struct device *led;
@@ -146,7 +148,7 @@ void os_led_test(void *param)
         LOG_I("time:%d:%d:%d", time.hour, time.min, time.sec);
         if (rtc_wakeup_flag)
         {
-            LOG_I("wakeup.");
+            LOG_I("os_led_test free stack:%d", os_get_free_stack());
             rtc_wakeup_flag = 0;
         }
     }
@@ -171,7 +173,7 @@ int main(void)
     led_dev_register("led", 8);
     
     os_task_create(os_led_test, 0, led_stack, sizeof(led_stack));
-    os_task_create(os_serial_test, "hello serial.\n", serial_stack, sizeof(serial_stack));
+    os_task_create(os_audio_test, "hello serial.\n", audio_stack, sizeof(audio_stack));
     os_task_create(os_msg_test, 0, msg_test_stack, sizeof(msg_test_stack));
     os_task_create(os_i2c_test, 0, i2c_stack, sizeof(i2c_stack));
     systick_init(os_tick_update);

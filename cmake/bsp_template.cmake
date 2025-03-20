@@ -7,8 +7,9 @@ set(VECT_TAB_OFFSET 0x0000)
 # set log level
 set(LOG_LEVEL 3)
 
-# set task max num
+# tinyos config
 set(OS_TASK_NUM_MAX 8)
+set(OS_GET_FREE_STACK_ENABLE 1)
 
 # 使用SPI OLED
 option(BSP_USING_SPI_OLED "Enable SPI OLED" ON)

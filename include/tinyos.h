@@ -43,6 +43,9 @@ void os_tick_update(void);
  */
 void os_delay(unsigned int tick);
 
+unsigned int os_get_tick(void);
+unsigned int os_get_free_stack(void);
+
 /**
  * @brief 接收一个消息
  * @param [in] msg 消息句柄

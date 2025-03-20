@@ -1,6 +1,10 @@
 #include <tinyos.h>
 #include <log.h>
 
+#ifndef OS_GET_FREE_STACK_ENABLE
+#define OS_GET_FREE_STACK_ENABLE (0)
+#endif
+
 #ifndef OS_TASK_NUM_MAX
 #define OS_TASK_NUM_MAX         (5)
 #endif
@@ -10,6 +14,9 @@ struct os_tcb
     unsigned int tick;
     unsigned int state;
     void *stack;
+#if (OS_GET_FREE_STACK_ENABLE)
+    void *stack_end;
+#endif
 };
 
 static unsigned int os_cur_task_idx = 0;             // 当前任务索引
@@ -68,6 +75,13 @@ int os_task_create(void (*func)(void *), void *param, void *stack, unsigned int 
         return -1;
 
     // 初始化任务栈
+    #if (OS_GET_FREE_STACK_ENABLE)
+    os_task_list[task_id].stack_end = stack;
+    for (unsigned int i = 0; i < stack_size / 4; i++)
+    {
+        ((unsigned int *)stack)[i] = 0xA5A5A5A5;
+    }
+    #endif
     os_task_list[task_id].stack = _os_stack_init(func, param, stack, stack_size);
     os_task_list[task_id].tick = os_sys_tick;
     os_task_list[task_id].state = 1;
@@ -115,6 +129,19 @@ unsigned int os_get_tick(void)
 {
     return os_sys_tick;
 }
+
+#if (OS_GET_FREE_STACK_ENABLE)
+unsigned int os_get_free_stack(void)
+{
+    unsigned int *stack_end = os_task_list[os_cur_task_idx].stack_end;
+    unsigned int free_size = 0;
+    
+    while (*stack_end++ == 0xA5A5A5A5)
+        free_size += 4;
+
+    return free_size;
+}
+#endif
 
 void os_msg_init(os_msg_t *msg)
 {
