@@ -6,6 +6,9 @@ CONFIGURE_FILE(include/bsp_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/bsp_config.h)
 
 if(${CHIP} MATCHES "STM32")
     aux_source_directory(stm32 DRIVERS_SRC)
+    if(${CHIP} MATCHES "STM32G0")
+        set(DRIVERS_SRC ${DRIVERS_SRC} stm32/flash/flash_g0.c)
+    endif()
 endif()
 
 if (BSP_USING_SPI_OLED)

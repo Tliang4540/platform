@@ -10,6 +10,7 @@
 #include <i2c.h>
 #include <rtc.h>
 #include <spiflash/spiflash.h>
+#include <onchip_flash.h>
 
 #include "audio_test/audio_test.h"
 #include "led_dev/led_dev.h"
@@ -39,9 +40,29 @@ static unsigned int i2c_stack[64];
 void os_i2c_test(void *param)
 {
     i2c_handle_t i2c;
+    onchip_flash_t ocflash;
+    unsigned int ocflash_data[2];
     unsigned char data[4];
 
     (void)param;
+
+    onchip_flash_init(&ocflash, 0x08000000 + (64 * 1024), 2 * 1024);
+    onchip_flash_read(&ocflash, 0, ocflash_data, 8);
+    if (ocflash_data[0] != 0xAA5555AA)
+    {
+        ocflash_data[0] = 0xAA5555AA;
+        ocflash_data[1] = 0;
+        onchip_flash_erase(&ocflash, 0, 2 * 1024);
+        onchip_flash_write(&ocflash, 0, ocflash_data, 8);
+        LOG_I("onchip flash init.");
+    }
+    else
+    {
+        ocflash_data[1]++;
+        onchip_flash_erase(&ocflash, 0, 2 * 1024);
+        onchip_flash_write(&ocflash, 0, ocflash_data, 8);
+        LOG_I("onchip flash data:%x", ocflash_data[1]);
+    }
 
     pin_mode(31, PIN_MODE_OUTPUT_PP);
 

@@ -5,6 +5,8 @@
 #cmakedefine BSP_USING_SPI_OLED
 /* SPIFLASH */
 #cmakedefine BSP_USING_SPIFLASH
+/* ONCHIP_FLASH */
+#cmakedefine BSP_USING_ONCHIP_FLASH
 
 /* UART */
 #define BSP_UART_BUFFER_SIZE  @BSP_UART_BUFFER_SIZE@
