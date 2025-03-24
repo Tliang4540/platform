@@ -29,7 +29,6 @@ void clk_init(void)
     LL_RCC_SetLPUARTClockSource(LL_RCC_LPUART2_CLKSOURCE_HSI);
 #endif
 
-    LL_PWR_SetPowerMode(LL_PWR_MODE_STOP1);
 #elif defined(STM32L0)
     SET_BIT(RCC->APB2ENR, LL_APB2_GRP1_PERIPH_SYSCFG);
     SET_BIT(RCC->APB1ENR, LL_APB1_GRP1_PERIPH_PWR);
@@ -49,8 +48,6 @@ void clk_init(void)
     LL_RCC_SetLPUARTClockSource(LL_RCC_LPUART1_CLKSOURCE_HSI);
 #endif
 
-    PWR->CR |= PWR_CR_FWU | PWR_CR_ULP | PWR_CR_LPSDSR;
-    RCC->CFGR |= RCC_CFGR_STOPWUCK; //wakeup clk source to hsi16
 #elif defined(STM32F0)
     SET_BIT(RCC->APB2ENR, RCC_APB2ENR_SYSCFGEN);
     SET_BIT(RCC->APB1ENR, RCC_APB1ENR_PWREN);
@@ -65,7 +62,6 @@ void clk_init(void)
 
     RCC->IOPENR = LL_IOP_GRP1_PERIPH_ALL;
 
-    RCC->CR |= PWR_CR_LPDS;
 #endif
 }
 
@@ -82,12 +78,4 @@ void clk_lsc_init(clk_lsc_t lsc)
     {
         LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
     }
-}
-
-void clk_exti_sleep(void)
-{
-    // LL_RCC_PLL_Enable();
-    // LL_RCC_PLL_EnableDomain_SYS();
-    while(!LL_RCC_PLL_IsReady());
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
 }

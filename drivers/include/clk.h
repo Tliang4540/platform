@@ -13,7 +13,6 @@ typedef enum
 
 void clk_init(void);
 void clk_lsc_init(clk_lsc_t lsc);
-void clk_exti_sleep(void);
 
 #ifdef __cplusplus
 }

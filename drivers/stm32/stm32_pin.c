@@ -313,9 +313,9 @@ void EXTI4_15_IRQHandler(void)
 {
     unsigned int tmp = exti_get_pending() & 0xfff0;
 
-    for (int i = 4; tmp; i++, tmp >>= 1)
+    for (int i = 4, n = tmp; n; i++, n >>= 1)
     {
-        if (tmp & 0x10)
+        if (n & 0x10)
         {
             exti_irq_handler(i);
         }

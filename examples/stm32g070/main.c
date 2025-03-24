@@ -11,10 +11,20 @@
 #include <rtc.h>
 #include <spiflash/spiflash.h>
 #include <onchip_flash.h>
+#include <pm.h>
 
 #include "audio_test/audio_test.h"
 #include "led_dev/led_dev.h"
 
+#define PM_TEST 1
+
+static unsigned int rtc_wakeup_flag = 0;
+void rtc_wakeup_callback(void)
+{
+    rtc_wakeup_flag = 1;
+}
+
+#if !PM_TEST
 static unsigned int play_flag = 0;
 static unsigned int audio_stack[128];
 void os_audio_test(void *param)
@@ -108,12 +118,6 @@ void timer_test_callback(void)
     os_msg_send(&msg_test, send_msg++);
 }
 
-static unsigned int rtc_wakeup_flag = 0;
-void rtc_wakeup_callback(void)
-{
-    rtc_wakeup_flag = 1;
-}
-
 static unsigned int msg_test_stack[64];
 void os_msg_test(void *param)
 {
@@ -175,6 +179,55 @@ void os_led_test(void *param)
     }
 }
 
+#else
+static unsigned int pin_wakeup_flag = 0;
+static void pin_wakeup_callback(void)
+{
+    pin_wakeup_flag = 1;
+}
+
+static unsigned int pm_stack[64];
+void os_pm_test(void *param)
+{
+    struct device *led;
+    unsigned int i = 0;
+    (void)param;
+
+    led = device_find("led");
+    device_open(led);
+
+    pin_pull(54, PIN_PULL_UP);
+    pin_mode(54, PIN_MODE_INPUT);
+    pm_set_mode(PM_MODE_SLEEP);
+
+    while (1)
+    {
+        for (i = 0; i < 10; i++)
+        {
+            device_write(led, "\x01", 1);
+            os_delay(100);
+            device_write(led, "\x00", 1);
+            os_delay(400);
+        }
+        LOG_I("enter sleep.");
+        os_delay(10);
+        pin_attach_irq(54, pin_wakeup_callback, PIN_IRQ_MODE_FALLING);
+        pin_wakeup_flag = 0;
+        i = 0;
+        pm_set_mode(PM_MODE_SLEEP);
+        while (pin_wakeup_flag == 0)
+        {
+            pm_enter_sleep();
+            i++;
+        }
+        pin_wakeup_flag = 0;
+        pm_set_mode(PM_MODE_RUN);
+        pin_attach_irq(54, 0, PIN_IRQ_MODE_DISABLE);
+        LOG_I("sleep time:%d", i);
+    }
+}
+#endif
+
 int main(void)
 {
     clk_init();
@@ -193,10 +246,14 @@ int main(void)
 
     led_dev_register("led", 8);
     
+    #if PM_TEST
+    os_task_create(os_pm_test, 0, pm_stack, sizeof(pm_stack));
+    #else
     os_task_create(os_led_test, 0, led_stack, sizeof(led_stack));
     os_task_create(os_audio_test, "hello serial.\n", audio_stack, sizeof(audio_stack));
     os_task_create(os_msg_test, 0, msg_test_stack, sizeof(msg_test_stack));
     os_task_create(os_i2c_test, 0, i2c_stack, sizeof(i2c_stack));
+    #endif
     systick_init(os_tick_update);
     os_start();
 }
