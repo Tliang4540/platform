@@ -209,8 +209,9 @@ void os_pm_test(void *param)
             device_write(led, "\x00", 1);
             os_delay(400);
         }
-        LOG_I("enter sleep.");
+        LOG_I("enter sleep.%d", rtc_wakeup_flag);
         os_delay(10);
+        rtc_wakeup_time_open(1000, rtc_wakeup_callback);
         pin_attach_irq(54, pin_wakeup_callback, PIN_IRQ_MODE_FALLING);
         pin_wakeup_flag = 0;
         i = 0;
@@ -220,9 +221,10 @@ void os_pm_test(void *param)
             pm_enter_sleep();
             i++;
         }
-        pin_wakeup_flag = 0;
         pm_set_mode(PM_MODE_RUN);
         pin_attach_irq(54, 0, PIN_IRQ_MODE_DISABLE);
+        rtc_wakeup_time_close();
+        rtc_wakeup_flag = 0;
         LOG_I("sleep time:%d", i);
     }
 }
@@ -242,7 +244,6 @@ int main(void)
     LOG_I("system startup.");
 
     rtc_init();
-    rtc_wakeup_time_open(1000, rtc_wakeup_callback);
 
     led_dev_register("led", 8);
     
