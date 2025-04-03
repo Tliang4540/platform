@@ -9,14 +9,14 @@
 #include <spi.h>
 #include <i2c.h>
 #include <rtc.h>
-#include <spiflash/spiflash.h>
-#include <onchip_flash.h>
+#include <flash.h>
 #include <pm.h>
+#include <tinydb.h>
 
 #include "audio_test/audio_test.h"
 #include "led_dev/led_dev.h"
 
-#define PM_TEST 1
+#define PM_TEST 0
 
 static unsigned int rtc_wakeup_flag = 0;
 void rtc_wakeup_callback(void)
@@ -46,33 +46,42 @@ void os_audio_test(void *param)
     }
 }
 
-static unsigned int i2c_stack[64];
+static unsigned int i2c_stack[256];
+#define TINYDB_TEST 1
+#if TINYDB_TEST
+static unsigned int db_test[32];
+#endif
 void os_i2c_test(void *param)
 {
     i2c_handle_t i2c;
-    onchip_flash_t ocflash;
-    unsigned int ocflash_data[2];
+#if TINYDB_TEST
+    tinydb_t tinydb;
+    unsigned int test_id = 10;
+#endif
+    flash_dev_t ocflash;
     unsigned char data[4];
 
     (void)param;
 
-    onchip_flash_init(&ocflash, 0x08000000 + (64 * 1024), 2 * 1024);
-    onchip_flash_read(&ocflash, 0, ocflash_data, 8);
-    if (ocflash_data[0] != 0xAA5555AA)
+    onchip_flash_init(&ocflash, 0, 0x08000000 + (64 * 1024), 10 * 2048);
+
+#if TINYDB_TEST
+    tinydb_init(&tinydb, &ocflash);
+    // tinydb_delete(&tinydb, 0);
+    if (tinydb_read(&tinydb, 0, db_test) == 0)
     {
-        ocflash_data[0] = 0xAA5555AA;
-        ocflash_data[1] = 0;
-        onchip_flash_erase(&ocflash, 0, 2 * 1024);
-        onchip_flash_write(&ocflash, 0, ocflash_data, 8);
-        LOG_I("onchip flash init.");
+        tinydb_format(&tinydb);
+        tinydb_write(&tinydb, 0, db_test, 8);
+        tinydb_read(&tinydb, 0, db_test);
     }
     else
     {
-        ocflash_data[1]++;
-        onchip_flash_erase(&ocflash, 0, 2 * 1024);
-        onchip_flash_write(&ocflash, 0, ocflash_data, 8);
-        LOG_I("onchip flash data:%x", ocflash_data[1]);
+        db_test[0]++;
+        tinydb_write(&tinydb, 0, db_test, 8);
+        tinydb_read(&tinydb, 0, db_test);
     }
+    LOG_I("db:%x %x", db_test[0], db_test[1]);
+#endif
 
     pin_mode(31, PIN_MODE_OUTPUT_PP);
 
@@ -106,6 +115,56 @@ void os_i2c_test(void *param)
                 LOG_I("os_i2c_test free stack:%d", os_get_free_stack());
                 play_flag = 1;
                 os_delay(100);
+
+            #if TINYDB_TEST
+                for (unsigned int i = 0; i < 2; i++)
+                {
+                    if (tinydb_read(&tinydb, 1, db_test))
+                    {
+                        db_test[0]++;
+                    }
+                    else
+                    {
+                        db_test[0] = 0;
+                    }
+                    tinydb_write(&tinydb, 1, db_test, 32);
+
+                    if (tinydb_read(&tinydb, 2, db_test))
+                    {
+                        db_test[0]++;
+                    }
+                    else
+                    {
+                        db_test[0] = 0;
+                    }
+                    tinydb_write(&tinydb, 2, db_test, 64);
+
+                    if (tinydb_read(&tinydb, 3, db_test))
+                    {
+                        db_test[0]++;
+                    }
+                    else
+                    {
+                        db_test[0] = 0;
+                    }
+                    tinydb_write(&tinydb, 3, db_test, 96);
+
+                    if (tinydb_read(&tinydb, 4, db_test))
+                    {
+                        db_test[0]++;
+                    }
+                    else
+                    {
+                        db_test[0] = 0;
+                    }
+                    tinydb_write(&tinydb, 4, db_test, 128);
+
+                    tinydb_write(&tinydb, test_id, db_test, 128);
+                    tinydb_read(&tinydb, test_id, db_test);
+                    LOG_I("test:%d", db_test[0]);
+                    test_id++;
+                }
+            #endif 
             }
         }
     }
@@ -133,10 +192,9 @@ void os_msg_test(void *param)
 
     while (1)
     {
-        ret = os_msg_recv(&msg_test, &recv_msg, 300);
+        ret = os_msg_recv(&msg_test, &recv_msg, 600);
         if (ret == 0)
         {
-            LOG_I("recv msg:%d", recv_msg);
             pin_write(9, recv_msg & 1);
         }
         else
@@ -159,20 +217,21 @@ void os_led_test(void *param)
     device_open(led);
     rtc_set_time(&time);
 
+    // rtc_wakeup_time_open(1000, rtc_wakeup_callback);
     while (1)
     {
         device_write(led, "\x01", 1);
         os_delay(100);
         device_write(led, "\x00", 1);
         os_delay(400);
-        rtc_get_time(&time);
-        tmp = rtc_mktime(&time);
-        LOG_I("tamp:%d", tmp);
-        rtc_localtime(tmp, &time);
-        LOG_I("date:%d-%d-%d %d", time.year, time.mon, time.mday, time.wday);
-        LOG_I("time:%d:%d:%d", time.hour, time.min, time.sec);
         if (rtc_wakeup_flag)
         {
+            rtc_get_time(&time);
+            tmp = rtc_mktime(&time);
+            LOG_I("tamp:%d", tmp);
+            rtc_localtime(tmp, &time);
+            LOG_I("date:%d-%d-%d %d", time.year, time.mon, time.mday, time.wday);
+            LOG_I("time:%d:%d:%d", time.hour, time.min, time.sec);
             LOG_I("os_led_test free stack:%d", os_get_free_stack());
             rtc_wakeup_flag = 0;
         }
@@ -198,7 +257,6 @@ void os_pm_test(void *param)
 
     pin_pull(54, PIN_PULL_UP);
     pin_mode(54, PIN_MODE_INPUT);
-    pm_set_mode(PM_MODE_SLEEP);
 
     while (1)
     {

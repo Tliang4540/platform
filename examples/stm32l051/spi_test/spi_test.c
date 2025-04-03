@@ -2,7 +2,7 @@
 #include <pin.h>
 #include <log.h>
 #include <tinyos.h>
-#include <spiflash/spiflash.h>
+#include <flash.h>
 #include "spi_test.h"
 
 #define SPI_CS_PIN          4
@@ -20,7 +20,7 @@ static void spi_test_task(void *param)
     unsigned char data_buf[32];
     unsigned int read_addr = 0;
     spi_handle_t spi;
-    spiflash_dev_t spiflash;
+    flash_dev_t spiflash;
 
     LOG_OUT("%s", param);
     
@@ -39,13 +39,13 @@ static void spi_test_task(void *param)
     pin_mode(SPI_CS_PIN, PIN_MODE_OUTPUT_PP); //cs
 
     spi_init(&spi, 0, 4, 16000000, SPI_MODE0 | SPI_MSB | SPI_MASTER | SPI_4WIRE | SPI_DATA_8BIT);
-    spiflash_init(&spiflash, &spi);
+    spiflash_init(&spiflash, &spi, 0, 8 * 1024 * 1024);
 
     while (1)
     {
         os_delay(200);
 
-        spiflash_read(&spiflash, read_addr, data_buf, 32);
+        flash_read(&spiflash, read_addr, data_buf, 32);
         LOG_I("read %x addr data:", read_addr);
         LOG_DUMP(data_buf, 32);
         read_addr += 32;

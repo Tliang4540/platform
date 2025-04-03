@@ -1,6 +1,6 @@
 #include <log.h>
 #include <serial.h>
-#include <mylib.h>
+#include <tinylib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
@@ -48,7 +48,7 @@ void log_printf(const char *format, ...)
                 log_buf[written++] = '-';
                 tmp = -tmp;
             }
-            written += my_utoa(tmp, &log_buf[written], 10);
+            written += tiny_utoa(tmp, &log_buf[written], 10);
             break;
         }
         case 'x':
@@ -63,7 +63,7 @@ void log_printf(const char *format, ...)
             }
             if((count & 1) == 0)
                 log_buf[written++] = '0';
-            written += my_utoa(tmp, &log_buf[written], 16);
+            written += tiny_utoa(tmp, &log_buf[written], 16);
             break;
         }
         case 's':

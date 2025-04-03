@@ -1,7 +1,7 @@
 #include <spi.h>
 #include <audio/audio.h>
 #include <pin.h>
-#include <spiflash/spiflash.h>
+#include <flash.h>
 #include <tinyos.h>
 #include <log.h>
 #include <string.h>
@@ -22,7 +22,7 @@ static struct audio_file_info file;
 static unsigned int audio_file_list[256];
 
 static spi_handle_t spi;
-static spiflash_dev_t spiflash;
+static flash_dev_t spiflash;
 static unsigned int pwr_pin;
 static void *fill_buffer;
 static unsigned int fill_size;
@@ -56,17 +56,18 @@ void audio_test_init(void)
     pin_mode(52, PIN_MODE_OUTPUT_PP); //cs
 
     spi_init(&spi, 0, 52, 32000000, SPI_MODE0 | SPI_MSB | SPI_MASTER | SPI_4WIRE | SPI_DATA_8BIT);
-    spiflash_init(&spiflash, &spi);
-    spiflash_read(&spiflash, AUDIO_FILE_START_ADDR, &file, sizeof(file));
+    spiflash_init(&spiflash, &spi, AUDIO_FILE_START_ADDR, 7 * 1024 * 1024);
+
+    flash_read(&spiflash, 0, &file, sizeof(file));
     LOG_I("all_num:%d", file.all_num);
     LOG_I("voice_num:%d", file.voice_num);
     LOG_I("version:%s", file.version);
     audio_file_list[0] = file.all_num * 4 + 64;
-    spiflash_read(&spiflash, AUDIO_FILE_START_ADDR + 64, &audio_file_list[1], file.all_num * 4);
-    for (unsigned int i = 0; i < 128; i++)
-    {
-        LOG_I("vocie %d addr:%x", i, audio_file_list[i]);
-    }
+    flash_read(&spiflash, 64, &audio_file_list[1], file.all_num * 4);
+    // for (unsigned int i = 0; i < 128; i++)
+    // {
+    //     LOG_I("vocie %d addr:%x", i, audio_file_list[i]);
+    // }
 }
 
 void audio_test_play(unsigned int index)
@@ -83,7 +84,7 @@ void audio_test_play(unsigned int index)
         if (fill_size)
         {
             read_size = fill_size > size ? size : fill_size;
-            spiflash_read(&spiflash, AUDIO_FILE_START_ADDR + addr, fill_buffer, read_size);
+            flash_read(&spiflash, addr, fill_buffer, read_size);
             for (unsigned int i = 0; i < read_size / 2; i++)
             {
                 ((unsigned short *)fill_buffer)[i] = ((unsigned int)(((short*)fill_buffer)[i]) + 32768) >> 6;

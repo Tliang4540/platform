@@ -1,8 +1,8 @@
-#include "mylib.h"
+#include "tinylib.h"
 
-unsigned my_utoa(unsigned val, char *str, unsigned radix)
+unsigned int tiny_utoa(unsigned int val, char *str, unsigned int radix)
 {
-    unsigned digit;
+    unsigned int digit;
     char *start = str;
 
     if (radix == 16)
@@ -24,7 +24,7 @@ unsigned my_utoa(unsigned val, char *str, unsigned radix)
         } while (val);
     }
     
-    unsigned len = start - str;
+    unsigned int len = start - str;
     start--;
 
     while (str < start)
